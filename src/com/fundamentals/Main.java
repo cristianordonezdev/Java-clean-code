@@ -2,14 +2,17 @@ package com.fundamentals;
 //import com.github.cliftonlabs.json_simple.JsonObject;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
@@ -19,13 +22,22 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    
     private static ArrayList<Json> formats = new ArrayList<>();
+	private static Properties properties = new Properties();
 
 	public static void main(String[] args) {
+        InputStream input = null;
 		
 	    try {
+	    	input = new FileInputStream("config.properties");
+	    	properties.load(input);
+	    	
             FileHandler fileHandler = new FileHandler("status.log");
             fileHandler.setFormatter(new SimpleFormatter());
             LOGGER.addHandler(fileHandler);
@@ -52,8 +64,8 @@ public class Main {
                 }
                 exceptionToClean();
 
-                JSONArray json_array = getToJSON();
-                System.out.println(json_array.toList());
+                JSONObject json_object = getToJSON();
+                System.out.println(json_object.toString());
                 bufferedReader.close();
             } catch (IOException e) {
             	LOGGER.severe(e.toString());
@@ -160,7 +172,8 @@ public class Main {
 		
 	}
 	
-	private static JSONArray getToJSON() {
+	private static JSONObject getToJSON() {
+		JSONObject json_object = new JSONObject();
 		
 		JSONArray json_array = new JSONArray();
 		for(Json format: formats){
@@ -173,7 +186,19 @@ public class Main {
 			
 			json_array.put(json);
 		}
-		return json_array;
+		String date = new SimpleDateFormat("ddMMyy").format(new Date());
+		json_object.put("id", properties.getProperty("ip") + "_" + date);
+        json_object.put("codigo", getTypeFile());
+		json_object.put("body", json_array);
+        json_object.put("fecha", date);
+        
+        
+		return json_object;
+	}
+	
+	private static String getTypeFile() {
+		//Some code to identify type of file
+		return "01";
 	}
 
 	private static void exceptionToClean() {
