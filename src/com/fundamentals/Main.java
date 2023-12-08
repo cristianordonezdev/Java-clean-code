@@ -53,7 +53,7 @@ public class Main {
         		
 
                 while ((line = bufferedReader.readLine()) != null) {
-                	if (containDate(line)) {
+                	if (headerMatcher(line).find()) {
                 		Json json_format = new Json();
                 		formats.add(json_format);
                 		getHeaderTransaction(clearData(line), json_format);
@@ -116,13 +116,6 @@ public class Main {
         return HttpRequest.BodyPublishers.ofString(json);
     }
 	
-	private static boolean containDate(String line) {
-
-        Pattern pattern = Pattern.compile("\\b\\d{1,2}/\\d{1,2}/\\d{2,4}\\b");
-        Matcher matcher = pattern.matcher(line);
-
-        return matcher.find();
-	}
 	
 	private static String clearData(String line) {
 		String regex = "[a-zA-Záéíóúñ._0-9\\/V=T=O=:\s]";
@@ -156,10 +149,16 @@ public class Main {
         }
 	}
 	
-	private static void getFormatDate(String cleared_data, Json json_format) {
+	private static Matcher headerMatcher(String line) {
 		Pattern pattern_regex_date = Pattern.compile("\\d{2}\\/\\d{2}\\/\\d{2}(\\s)?\\d{2}\\:\\d{2}");
-		Matcher matcher_date = pattern_regex_date.matcher(cleared_data);
+		Matcher matcher_date = pattern_regex_date.matcher(line);
 		
+		return matcher_date;
+	}
+	
+	private static void getFormatDate(String cleared_data, Json json_format) {
+		Matcher matcher_date = headerMatcher(cleared_data);
+
 		String date = "";
 		while (matcher_date.find()) {
 			date += matcher_date.group();
@@ -169,7 +168,6 @@ public class Main {
 		} else {
 			json_format.FECHA = date;
 		}
-		
 	}
 	
 	private static JSONObject getToJSON() {
