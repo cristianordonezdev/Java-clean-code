@@ -1,5 +1,5 @@
 package com.fundamentals;
-import com.github.cliftonlabs.json_simple.JsonObject;
+//import com.github.cliftonlabs.json_simple.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,11 +16,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
-
+import org.json.*;
 
 public class Main {
 
 	public static void main(String[] args) {
+		
 		
 		
 		String rutaArchivo = "what.txt";
@@ -43,19 +44,20 @@ public class Main {
             		formats.get(index).DATA += clearData(line) + "\n";
             	}
             }
-    		System.out.println(formats.size());
+            JSONArray json_array = getToJSON(formats);
+            System.out.println(json_array.toList());
     		int i = 0;
-    		for (Json format : formats) {
-    			
-        		System.out.println("=============TRANSACCION "+ i +"=================");
-                System.out.println("HEADER: " + format.HEADER);
-                System.out.println("FECHA: " + format.FECHA);
-                System.out.println("VENTA: " + format.VENTA);
-                System.out.println("TERMINAL: " + format.TERMINAL);
-                System.out.println("OPERACION: " + format.OPERACION);
-                System.out.println("DATA: " + format.DATA);
-                i += 1;
-            }
+//    		for (Json format : formats) {
+//    			
+//        		System.out.println("=============TRANSACCION "+ i +"=================");
+//                System.out.println("HEADER: " + format.HEADER);
+//                System.out.println("FECHA: " + format.FECHA);
+//                System.out.println("VENTA: " + format.VENTA);
+//                System.out.println("TERMINAL: " + format.TERMINAL);
+//                System.out.println("OPERACION: " + format.OPERACION);
+//                System.out.println("DATA: " + format.DATA);
+//                i += 1;
+//            }
 
             bufferedReader.close();
         } catch (IOException e) {
@@ -88,8 +90,8 @@ public class Main {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             // Imprimir el código de respuesta y el cuerpo de la respuesta
-            System.out.println("Código de respuesta: " + response.statusCode());
-            System.out.println("Cuerpo de la respuesta: " + response.body());
+//            System.out.println("Código de respuesta: " + response.statusCode());
+//            System.out.println("Cuerpo de la respuesta: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,19 +157,30 @@ public class Main {
 			date += matcher_date.group();
 		}
 		if (date.isEmpty()) {
-		    System.out.println("NO EXISTE FECHA");
+//		    System.out.println("NO EXISTE FECHA");
 		} else {
 			json_format.FECHA = date;
 		}
 		
 	}
 	
-	
-	private static void generateJSON() {
+	private static JSONArray getToJSON(ArrayList<Json> formats) {
 		
-		JsonObject json = new JsonObject();
-        json.put("nombre", "Juan");
-        json.put("edad", 25);
-        System.out.println(json.toString());
+		JSONArray json_array = new JSONArray();
+		for(Json format: formats){
+			JSONObject json = new JSONObject();
+			json.put("FECHA", format.FECHA);
+			json.put("VENTA", format.VENTA);
+			json.put("TERMINAL", format.TERMINAL);
+			json.put("OPERACION", format.OPERACION);
+			json.put("DATA", format.DATA);
+			
+			json_array.put(json);
+			
+		}
+		
+		return json_array;
 	}
+	
+
 }
