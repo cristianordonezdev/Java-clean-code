@@ -178,11 +178,11 @@ public class Main {
 		JSONArray json_array = new JSONArray();
 		for(Json format: formats){
 			JSONObject json = new JSONObject();
-			json.put("FECHA", format.FECHA);
-			json.put("VENTA", format.VENTA);
-			json.put("TERMINAL", format.TERMINAL);
-			json.put("OPERACION", format.OPERACION);
-			json.put("DATA", format.DATA);
+			json.put("fecha", format.FECHA);
+			json.put("venta", format.VENTA);
+			json.put("terminal", format.TERMINAL);
+			json.put("operacion", format.OPERACION);
+			json.put("data", format.DATA);
 			
 			json_array.put(json);
 		}
