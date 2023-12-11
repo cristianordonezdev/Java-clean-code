@@ -48,8 +48,6 @@ public class File1 {
 
 				while ((line = bufferedReader.readLine()) != null) {
 					
-					
-					
 					if (headerMatcher(line).find()) {
 						Json json_format = new Json();
 						formats.add(json_format);
@@ -86,21 +84,26 @@ public class File1 {
 	}
 
 	private void getHeaderTransaction(String line, Json json_format) {
-
-		String[] parts = line.split("\\s+");
 		json_format.HEADER = line;
 		getFormatDate(line, json_format);
+		
+		Pattern pattern_rest_options = Pattern.compile("V=\\d{8}(\\s?)T=\\d{3}(\\s?)O=\\d{4}");
+        Matcher matcher = pattern_rest_options.matcher(line);
+        
+        if (matcher.find()) {
+        	String[] parts = matcher.group().split("\\s+");
+        	for (int i = 0; i < parts.length; i++) {
+        		if (parts[i].startsWith("V=")) {
+        			json_format.VENTA = parts[i].substring(2);
+        		} if (parts[i].startsWith("T=")) {
+        			
+        			json_format.TERMINAL = parts[i].substring(2);
+        		} if (parts[i].startsWith("O=")) {
+        			json_format.OPERACION = parts[i].substring(2);
+        		}
+        	}
+        }
 
-		for (int i = 0; i < parts.length; i++) {
-			if (parts[i].startsWith("V=")) {
-				json_format.VENTA = parts[i].substring(2);
-			} else if (parts[i].startsWith("T=")) {
-
-				json_format.TERMINAL = parts[i].substring(2);
-			} else if (parts[i].startsWith("O=")) {
-				json_format.OPERACION = parts[i].substring(2);
-			}
-		}
 	}
 
 	private Matcher headerMatcher(String line) {
