@@ -1,23 +1,19 @@
 package com.fundamentals;
 //import com.github.cliftonlabs.json_simple.JsonObject;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import org.json.*;
 
 
 public class Main {
 	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-	private static ArrayList<Json> formats = new ArrayList<>();
 	private static Properties properties = new Properties();
 
 	public static void main(String[] args) {
@@ -26,55 +22,59 @@ public class Main {
 		try {
 			input = new FileInputStream("config.properties");
 			properties.load(input);
-
+			
 			FileHandler fileHandler = new FileHandler("status.log");
 			fileHandler.setFormatter(new SimpleFormatter());
 			LOGGER.addHandler(fileHandler);
 			LOGGER.info("INICIANDO PROGRAMA");
+			
+	        String folder = "files"; 
 
-			String file_route = "ticket1.txt";
-
-			try {
-				if ("01" == identifyFile(file_route)) {
-					File1 file_instance = new File1(file_route);
-					file_instance.main();
-				} else if ("02" == identifyFile(file_route)) {
-					File2 file_instance = new File2(file_route);
-					file_instance.main();
-				}
-				
-;
-			} catch (Exception e) {
-				LOGGER.severe(e.toString());
-			}
+			String archivoMasReciente_2 = obtenerArchivoMasReciente(folder, "EJALL");
+	        String archivoMasReciente_1 = obtenerArchivoMasReciente(folder, "ejbackup");
+	        
+	        if (archivoMasReciente_1 != null || archivoMasReciente_2 != null) {
+//	        	------JSON FILE 1----------
+	        	File1 file1 = new File1(folder + "\\" + archivoMasReciente_1);
+	        	JSONObject json_1 = file1.main();
+	        	System.out.println("JSON DE CHINO: ");
+	        	System.out.println(json_1);
+//	        	----------------------------	        	
+//	        	------JSON FILE 2----------
+	        	File2 file2 = new File2(folder + "\\" + archivoMasReciente_2);
+	        	JSONObject json_2 = file2.main();
+	        	System.out.println("JSON DE YALI: ");
+	        	System.out.println(json_2);
+//	        	----------------------------
+	        } else {
+	        	System.out.println("No se encontraron archivos en la carpeta especificada.");
+	        }
+			
 		} catch (Exception e) {
 			LOGGER.severe("Error al configurar el registro: " + e.getMessage());
 		}
 	}
 
-	private static String identifyFile(String file) {
-		String result_code = "02";
-		try {
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			String line;
+	private static String obtenerArchivoMasReciente(String carpeta, String type_name) {
+        File directorio = new File(carpeta);
+        File[] archivos = directorio.listFiles((dir, nombre) -> nombre.contains(type_name));
+      
 
-			while ((line = bufferedReader.readLine()) != null) {
-				if (headerMatcher(line).find()) {
-					result_code = "01";
-				}
-			}
-		} catch (Exception e) {
-			LOGGER.severe("NO SE PUDO LEER EL ARCHIVO" + e.getMessage());
-		}
-		
-		return result_code;
-	}
+        if (archivos != null && archivos.length > 0) {
+            File archivoMasReciente = archivos[0];
+
+            for (File archivo : archivos) {
+            
+                if (archivo.isFile()) {
+                   
+                    if (archivo.lastModified() > archivoMasReciente.lastModified()) {
+                        archivoMasReciente = archivo;
+                    }
+                }
+            }
+            return archivoMasReciente.getName();
+        }
+        return null;
+    }
 	
-	private static Matcher headerMatcher(String line) {
-		Pattern pattern_regex_date = Pattern.compile("\\d{2}\\/\\d{2}\\/\\d{2}(\\s)?\\d{2}\\:\\d{2}");
-		Matcher matcher_date = pattern_regex_date.matcher(line);
-
-		return matcher_date;
-	}
 }

@@ -27,7 +27,7 @@ public class File1 {
 		this.file = file;
 	}
 	
-	public void main() {
+	public JSONObject main() {
 		InputStream input = null;
 
 		try {
@@ -47,27 +47,28 @@ public class File1 {
 				int index = -1;
 
 				while ((line = bufferedReader.readLine()) != null) {
-					
+
 					if (headerMatcher(line).find()) {
 						Json json_format = new Json();
 						formats.add(json_format);
 						getHeaderTransaction(clearData(line), json_format);
 						index += 1;
-					} else {
+					} else if (formats.size() > 0){
 						formats.get(index).DATA += clearData(line) + "\n";
 					}
 				}
 				exceptionToClean();
 
-				JSONObject json_object = getToJSON();
-				System.out.println(json_object.toString());
 				bufferedReader.close();
+				return getToJSON();
 			} catch (IOException e) {
 				LOGGER.severe(e.toString());
 			}
 		} catch (Exception e) {
 			LOGGER.severe("Error al configurar el registro: " + e.getMessage());
 		}
+		return new JSONObject();
+		
 	}
 	
 	private String clearData(String line) {
