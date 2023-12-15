@@ -56,13 +56,15 @@ public class File2 {
 
                 } else if (!miJson.isEmpty()) {
                     JSONObject registro = new JSONObject();
-                    if (linea.startsWith("1")) {
+                    String[] tipo = linea.split(",");
+                    
+                    if (tipo[0].trim().equals("1")) {
                         registro.put("articulo", linea);
                         registros.put(registro);
-                    } else if (linea.startsWith("2")) {
+                    } else if (tipo[0].trim().equals("2")) {
                         registro.put("formatopago", linea);
                         registros.put(registro);
-                    } else if (linea.startsWith("22") || linea.startsWith("95")) {
+                    } else if (!tipo[0].trim().equals("1") && !tipo[0].trim().equals("2")) {
                         // Crea un nuevo objeto JSON para cada línea "promo"
                         JSONObject promoObject = new JSONObject();
                         promoObject.put("promo", linea);

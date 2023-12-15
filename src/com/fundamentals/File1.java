@@ -160,7 +160,7 @@ public class File1 {
 	private void exceptionToClean() {
 		ArrayList<Json> temporal_formats = new ArrayList<>();
 
-		String[] exceptions = { "CERRADO", "APLICACION PALACIO", "ABIERTO", "TERMINAL SETUP" };
+		String[] exceptions = { "CERRADO", "VERSION", "ABIERTO", "TERMINAL SETUP" };
 		for (int i = 0; i < formats.size(); i++) {
 			for (String exception_word : exceptions) {
 				if (formats.get(i).DATA.contains(exception_word)) {
