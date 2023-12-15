@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import utils.Records;
 
 public class File2 {
 	private String file;
@@ -45,12 +45,19 @@ public class File2 {
                         miJson = new JSONObject();
                         registros = new JSONArray();
 
-                       
+                        Records records = new Records();
+
                         String[] partes = obtenerPartesRelevantes(matcher.group()).split(",");
-                        miJson.put("pago", partes[0] + partes[1]);
-                        miJson.put("operacion", partes[2]);
-                        miJson.put("vendedor", partes[3]);
-                        miJson.put("codigo", partes[4]);
+                        
+                        if (! records.main(partes[0] + partes[1] + partes[2] + partes[3] + partes[4])) {
+
+                        	miJson.put("pago", partes[0] + partes[1]);
+                        	miJson.put("operacion", partes[2]);
+                        	miJson.put("vendedor", partes[3]);
+                        	miJson.put("codigo", partes[4]);
+                        }
+                        
+
                     } else if (!miJson.isEmpty()) {
                         JSONObject registro = new JSONObject();
                         if (linea.startsWith("1")) {

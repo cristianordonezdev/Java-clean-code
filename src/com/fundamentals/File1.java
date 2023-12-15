@@ -16,6 +16,7 @@ import java.util.logging.SimpleFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import utils.Records;
 
 public class File1 {
 	private final Logger LOGGER = Logger.getLogger(Main.class.getName());
@@ -88,6 +89,7 @@ public class File1 {
 		json_format.HEADER = line;
 		getFormatDate(line, json_format);
 		
+		
 		Pattern pattern_rest_options = Pattern.compile("V=\\d{8}(\\s?)T=\\d{3}(\\s?)O=\\d{4}");
         Matcher matcher = pattern_rest_options.matcher(line);
         
@@ -130,17 +132,20 @@ public class File1 {
 
 	private JSONObject getToJSON() {
 		JSONObject json_object = new JSONObject();
-
 		JSONArray json_array = new JSONArray();
-		for (Json format : formats) {
-			JSONObject json = new JSONObject();
-			json.put("fecha", format.FECHA);
-			json.put("venta", format.VENTA);
-			json.put("terminal", format.TERMINAL);
-			json.put("operacion", format.OPERACION);
-			json.put("data", format.DATA);
+		
+		Records records = new Records();
 
-			json_array.put(json);
+		for (Json format : formats) {
+			if (!records.main(format.HEADER)) {				
+				JSONObject json = new JSONObject();
+				json.put("fecha", format.FECHA);
+				json.put("venta", format.VENTA);
+				json.put("terminal", format.TERMINAL);
+				json.put("operacion", format.OPERACION);
+				json.put("data", format.DATA);
+				json_array.put(json);
+			}
 		}
 		String date = new SimpleDateFormat("ddMMyy").format(new Date());
 		json_object.put("id", properties.getProperty("ip") + "_" + date);

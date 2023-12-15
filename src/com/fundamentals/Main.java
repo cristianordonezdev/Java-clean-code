@@ -35,9 +35,9 @@ public class Main {
 	        
 	        if (archivoMasReciente_1 != null || archivoMasReciente_2 != null) {
 //	        	------JSON FILE 1----------
-	        	File1 file1 = new File1(folder + "\\" + archivoMasReciente_1);
+	        	File1 file1 = new File1(folder + "\\ejbackup.d14");
 	        	JSONObject json_1 = file1.main();
-	        	System.out.println("JSON DE CHINO: ");
+	        	System.out.println("JSON DE CHINO: " + archivoMasReciente_1);
 	        	System.out.println(json_1);
 //	        	----------------------------	        	
 //	        	------JSON FILE 2----------
