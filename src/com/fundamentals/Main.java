@@ -35,7 +35,7 @@ public class Main {
 	        
 	        if (archivoMasReciente_1 != null || archivoMasReciente_2 != null) {
 //	        	------JSON FILE 1----------
-	        	File1 file1 = new File1(folder + "\\ejbackup.d14");
+	        	File1 file1 = new File1(folder + "\\" + archivoMasReciente_1);
 	        	JSONObject json_1 = file1.main();
 	        	System.out.println("JSON DE CHINO: " + archivoMasReciente_1);
 	        	System.out.println(json_1);
@@ -43,7 +43,7 @@ public class Main {
 //	        	------JSON FILE 2----------
 	        	File2 file2 = new File2(folder + "\\" + archivoMasReciente_2);
 	        	JSONObject json_2 = file2.main();
-	        	System.out.println("JSON DE YALI: ");
+	        	System.out.println("JSON DE YALI: " + archivoMasReciente_2);
 	        	System.out.println(json_2);
 //	        	----------------------------
 	        } else {

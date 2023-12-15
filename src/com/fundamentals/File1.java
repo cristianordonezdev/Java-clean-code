@@ -63,13 +63,15 @@ public class File1 {
 				bufferedReader.close();
 				return getToJSON();
 			} catch (IOException e) {
+				System.out.println("main error");
 				LOGGER.severe(e.toString());
 			}
 		} catch (Exception e) {
+			System.out.println("main error1" + e);
+
 			LOGGER.severe("Error al configurar el registro: " + e.getMessage());
 		}
 		return new JSONObject();
-		
 	}
 	
 	private String clearData(String line) {
@@ -88,7 +90,6 @@ public class File1 {
 	private void getHeaderTransaction(String line, Json json_format) {
 		json_format.HEADER = line;
 		getFormatDate(line, json_format);
-		
 		
 		Pattern pattern_rest_options = Pattern.compile("V=\\d{8}(\\s?)T=\\d{3}(\\s?)O=\\d{4}");
         Matcher matcher = pattern_rest_options.matcher(line);
@@ -157,13 +158,19 @@ public class File1 {
 	}
 
 	private void exceptionToClean() {
+		ArrayList<Json> temporal_formats = new ArrayList<>();
+
 		String[] exceptions = { "CERRADO", "APLICACION PALACIO", "ABIERTO", "TERMINAL SETUP" };
-		for (int i = formats.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < formats.size(); i++) {
 			for (String exception_word : exceptions) {
 				if (formats.get(i).DATA.contains(exception_word)) {
-					formats.remove(i);
+					temporal_formats.add(formats.get(i));
 				}
 			}
 		}
+		
+		ArrayList<Json> copy = new ArrayList<Json>(formats);
+		copy.removeAll(temporal_formats);
+		formats = copy;
 	}
 }
