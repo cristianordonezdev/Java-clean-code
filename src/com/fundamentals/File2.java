@@ -1,4 +1,5 @@
 package com.fundamentals;
+
 import org.json.*;
 
 import java.io.BufferedReader;
@@ -11,115 +12,109 @@ import java.util.regex.Pattern;
 import utils.Records;
 
 public class File2 {
-	private String file;
-	
-	public File2(String file) {
-		this.file = file;
-	}
-	 public JSONObject main() {
+    private String file;
 
-            try {
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                String linea;
+    public File2(String file) {
+        this.file = file;
+    }
 
-                String patron = "0,\\d{1,2},\\d{4},\\d{5,8},[\\w\\w]+";
-                Pattern pattern = Pattern.compile(patron);
+    public JSONObject main() {
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String linea;
 
-                JSONArray bloques = new JSONArray();
-                JSONObject miJson = new JSONObject();
-                JSONArray registros = new JSONArray();
+            String patron = "0,\\d{1,2},\\d{4},\\d{5,8},[\\w\\w]+";
+            Pattern pattern = Pattern.compile(patron);
 
-                while ((linea = bufferedReader.readLine()) != null) {
-                    Matcher matcher = pattern.matcher(linea);
+            JSONArray bloques = new JSONArray();
+            JSONObject miJson = new JSONObject();
+            JSONArray registros = new JSONArray();
 
-                    if (matcher.find()) {
-                        if (!miJson.isEmpty()) {
-                      
-                            miJson.put("registros", registros);
-                           
-                            bloques.put(miJson);
-                        }
+            while ((linea = bufferedReader.readLine()) != null) {
+                Matcher matcher = pattern.matcher(linea);
 
-                     
-                        miJson = new JSONObject();
-                        registros = new JSONArray();
+                if (matcher.find()) {
+                    if (!miJson.isEmpty()) {
+                        miJson.put("registros", registros);
+                        bloques.put(miJson);
+                    }
 
-                        Records records = new Records();
+                    miJson = new JSONObject();
+                    registros = new JSONArray();
 
-                        String[] partes = obtenerPartesRelevantes(matcher.group()).split(",");
-                        
-                        if (! records.main(partes[0] + partes[1] + partes[2] + partes[3] + partes[4])) {
+                    Records records = new Records();
 
-                        	miJson.put("pago", partes[0] + partes[1]);
-                        	miJson.put("operacion", partes[2]);
-                        	miJson.put("vendedor", partes[3]);
-                        	miJson.put("codigo", partes[4]);
-                        }
-                        
+                    String[] partes = obtenerPartesRelevantes(matcher.group()).split(",");
 
-                    } else if (!miJson.isEmpty()) {
-                        JSONObject registro = new JSONObject();
-                        if (linea.startsWith("1")) {
-                           
-                            registro.put("articulo", linea);
-                            registros.put(registro);
-                        } else if (linea.startsWith("2")) {
-                           
-                            registro.put("formatopago", linea);
-                            registros.put(registro);
-                        }
+                    if (!records.main(partes[0] + partes[1] + partes[2] + partes[3] + partes[4])) {
+                        miJson.put("pago", partes[0] + partes[1]);
+                        miJson.put("operacion", partes[2]);
+                        miJson.put("vendedor", partes[3]);
+                        miJson.put("codigo", partes[4]);
+                    }
+
+                } else if (!miJson.isEmpty()) {
+                    JSONObject registro = new JSONObject();
+                    if (linea.startsWith("1")) {
+                        registro.put("articulo", linea);
+                        registros.put(registro);
+                    } else if (linea.startsWith("2")) {
+                        registro.put("formatopago", linea);
+                        registros.put(registro);
+                    } else if (linea.startsWith("22") || linea.startsWith("95")) {
+                        // Crea un nuevo objeto JSON para cada línea "promo"
+                        JSONObject promoObject = new JSONObject();
+                        promoObject.put("promo", linea);
+                        registros.put(promoObject);  // Mover esta línea aquí para agregar "promo" al final
                     }
                 }
-
-               
-                miJson.put("registros", registros);
-                
-                bloques.put(miJson);
-
-                
-                SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
-                String fechaActual = dateFormat.format(new Date());
-
-                
-                JSONObject cuerpoJson = new JSONObject();
-                cuerpoJson.put("tienda", "1002");
-                cuerpoJson.put("fecha", fechaActual);
-                cuerpoJson.put("codigo", "02");
-
-                
-                String direccionIP = obtenerDireccionIP();
-                String id = direccionIP + "_" + fechaActual;
-                cuerpoJson.put("id", id);
-
-                
-                cuerpoJson.put("body", bloques);
-          
-                bufferedReader.close();
-                return cuerpoJson;
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Error al abrir el archivo: " + e.getMessage());
             }
-            return new JSONObject();
-	         
-	    }
-	    private String obtenerPartesRelevantes(String linea) {
-	        String[] partes = linea.split(",");
-	        StringBuilder resultado = new StringBuilder();
 
-	        for (String parte : partes) {
-	            if (parte.trim().length() > 0) {
-	                if (resultado.length() > 0) {
-	                    resultado.append(",");
-	                }
-	                resultado.append(parte);
-	            }
-	        }
+            miJson.put("registros", registros);
+            bloques.put(miJson);
 
-	        return resultado.toString();
-	    }
-	    private String obtenerDireccionIP() {
-	        return "192.168.1.3";
-	    }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+            String fechaActual = dateFormat.format(new Date());
+
+            JSONObject cuerpoJson = new JSONObject();
+            cuerpoJson.put("tienda", "1002");
+            cuerpoJson.put("fecha", fechaActual);
+            cuerpoJson.put("codigo", "02");
+
+            String direccionIP = obtenerDireccionIP();
+            String id = direccionIP + "_" + fechaActual;
+            cuerpoJson.put("id", id);
+
+            cuerpoJson.put("body", bloques);
+
+            bufferedReader.close();
+            return cuerpoJson;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al abrir el archivo: " + e.getMessage());
+        }
+        return new JSONObject();
+    }
+
+    private String obtenerPartesRelevantes(String linea) {
+        String[] partes = linea.split(",");
+        StringBuilder resultado = new StringBuilder();
+
+        for (String parte : partes) {
+            if (parte.trim().length() > 0) {
+                if (resultado.length() > 0) {
+                    resultado.append(",");
+                }
+                resultado.append(parte);
+            }
+        }
+
+        return resultado.toString();
+    }
+
+    private String obtenerDireccionIP() {
+        return "192.168.1.3";
+    }
 }
+
